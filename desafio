@@ -1,3 +1,87 @@
+class PersonalArray:
+    SIZE = 5
+    insertPosition = 0
+    elements = [None] * SIZE
+    
+    def isEmpty(self):
+        return self.size() == 0
+    
+    def size(self):
+        return self.insertPosition
+    
+    def isMemoryFull(self):
+        return self.insertPosition == len(self.elements)
+    
+    def append(self, newElement):
+        if self.isMemoryFull():
+            self.updateMemory()
+        self.elements[self.insertPosition] = newElement
+        self.insertPosition += 1
+    
+    def updateMemory(self):
+        newArray = [None] * (self.size() + self.SIZE)
+        for position in range(self.insertPosition):
+            newArray[position] = self.elements[position]
+        self.elements = newArray
+    
+    def clear(self):
+        self.elements = [None] * self.SIZE
+        self.insertPosition = 0
+    
+    def remove(self):
+        if not self.isEmpty():
+            self.elements[self.insertPosition - 1] = None
+            self.insertPosition -= 1
+    
+    def removePosition(self, position):
+        if position < 0 or position >= self.insertPosition:
+            print("Posição inválida!")
+            return ""
+        removedElement = self.elements[position]
+        index = position
+        while index < self.insertPosition - 1:
+            self.elements[index] = self.elements[index+1]
+            index += 1
+        self.insertPosition -= 1
+        return removedElement
+    
+    def insertAt(self, position, newElement):
+        if position < 0 or position > self.insertPosition:
+            print("Posição inválida!")
+            return
+        if self.isMemoryFull():
+            self.updateMemory()
+        index = self.insertPosition - 1
+        while index >= position:
+            self.elements[index + 1] = self.elements[index]
+            index -= 1
+        self.elements[position] = newElement
+        self.insertPosition += 1   
+    
+    def elementAt(self, position):
+        if position < 0 or position >= self.insertPosition:
+            print("Posição inválida!")
+            return None
+        return self.elements[position]
+
+class PersonalStack:
+    list = PersonalArray()
+    
+    def push(self, newElement):
+        self.list.insertAt(0, newElement)
+    
+    def pop(self):
+        return self.list.removePosition(0)
+
+class PersonalQueue:
+    list = PersonalArray()
+    
+    def enqueue(self, newElement):
+        self.list.insertAt(0, newElement)
+    
+    def dequeue(self):
+        return self.list.removePosition(self.list.size() - 1)
+
 class Hanoi:
     def __init__(self, n):
         self.torres = {
@@ -5,10 +89,13 @@ class Hanoi:
             'B': [],
             'C': []
         }
+    
     def push(self, destino, disco):
         self.torres[destino].append(disco)
+    
     def pop(self, origem):
         return self.torres[origem].pop() if self.torres[origem] else None
+    
     def mover(self, origem, destino):
         if not self.torres[origem]:
             print("Movimento inválido! Torre de origem vazia.")
@@ -19,21 +106,20 @@ class Hanoi:
             self.push(origem, disco)
         else:
             self.push(destino, disco)
+    
     def mostrar(self):
         for t, pilha in self.torres.items():
             print(f"{t}: {pilha}")
         print()
+
 n = int(input("Quantos discos? "))
 jogo = Hanoi(n)
 jogo.mostrar()
-for _ in iter(int, 1): 
-    if jogo.torres['C'] == list(range(n, 0, -1)):
-        break
+while jogo.torres['C'] != list(range(n, 0, -1)):
     o, d = input("Mover de para (ex: A C): ").upper().split()
     if o in 'ABC' and d in 'ABC':
         jogo.mover(o, d)
         jogo.mostrar()
     else:
         print("Entradas inválidas! Use A, B ou C.")
-print("Parabéns! Você completou o jogo."
-
+print("Parabéns! Você completou o jogo.")
