@@ -1,0 +1,158 @@
+import heapq
+
+class Grafo:
+    def __init__(self):
+        self.cidades = {}
+
+    def adicionar_rota(self, origem, destino, distancia):
+        if origem not in self.cidades:
+            self.cidades[origem] = []
+        if destino not in self.cidades:
+            self.cidades[destino] = []
+        self.cidades[origem].append((destino, distancia))
+        self.cidades[destino].append((origem, distancia))
+
+    def menor_caminho(self, inicio, fim):
+        fila = [(0, inicio, [])]
+        visitados = set()
+
+        while fila:
+            distancia, atual, caminho = heapq.heappop(fila)
+
+            if atual in visitados:
+                continue
+
+            visitados.add(atual)
+            caminho = caminho + [atual]
+
+            if atual == fim:
+                return (distancia, caminho)
+
+            for vizinho, dist in self.cidades.get(atual, []):
+                if vizinho not in visitados:
+                    heapq.heappush(fila, (distancia + dist, vizinho, caminho))
+
+        return None
+
+    def mostrar_mapa(self):
+        print("\n--- Mapa de Cidades e Rotas ---")
+        for cidade in self.cidades:
+            conexoes = ', '.join([f"{vizinho} ({dist} km)" for vizinho, dist in self.cidades[cidade]])
+            print(f"{cidade} -> {conexoes}")
+        print("-------------------------------\n")
+
+def carregar_mapa_tocantins(grafo):
+    rotas = [
+        ("Palmas", "Paraiso", 75),
+        ("Paraiso", "Pugmil", 28),
+        ("Pugmil", "Nova Rosalandia", 15),
+        ("Paraiso", "Pium", 60),
+        ("Palmas", "Miracema", 89),
+        ("Miracema", "Paraiso", 106),
+        ("Palmas", "Porto Nacional", 60),
+        ("Porto Nacional", "Pium", 133),
+        ("Nova Rosalandia", "Lagoa da Confusão", 85),
+        ("Palmas", "Lajeado", 60),
+        ("Lajeado", "Miracema", 30),
+        ("Lajeado", "Porto Nacional", 90),
+        ("Palmas", "Brejinho de Nazaré", 70),
+        ("Brejinho de Nazaré", "Porto Nacional", 40),
+        ("Brejinho de Nazaré", "Monte do Carmo", 55),
+        ("Palmas", "Monte do Carmo", 110),
+        ("Monte do Carmo", "Santa Rosa", 75),
+        ("Santa Rosa", "Porto Nacional", 120),
+        ("Palmas", "Aparecida do Rio Negro", 120),
+        ("Aparecida do Rio Negro", "Santa Rosa", 65),
+        ("Aparecida do Rio Negro", "Lagoa do Tocantins", 40),
+        ("Lagoa do Tocantins", "Santa Rosa", 50)
+    ]
+    for origem, destino, distancia in rotas:
+        grafo.adicionar_rota(origem, destino, distancia)
+    print("Mapa do Tocantins (com rotas alternativas) carregado com sucesso!")
+    grafo.mostrar_mapa()
+
+def menu():
+    grafo = Grafo()
+    pacotes = []
+
+    # Carrega o mapa automaticamente
+    carregar_mapa_tocantins(grafo)
+
+    while True:
+        print("\n--- MENU ---")
+        print("1. Adicionar rota")
+        print("2. Recarregar municípios do Tocantins")
+        print("3. Adicionar pacote")
+        print("4. Calcular rota de entregas (a partir de Palmas)")
+        print("5. Sair")
+        opcao = input("Escolha: ")
+
+        if opcao == "1":
+            origem = input("Cidade de origem: ")
+            destino = input("Cidade de destino: ")
+            distancia = int(input("Distância em km: "))
+            grafo.adicionar_rota(origem, destino, distancia)
+            print("Rota adicionada com sucesso!")
+
+        elif opcao == "2":
+            carregar_mapa_tocantins(grafo)
+
+        elif opcao == "3":
+            cidade = input("Cidade onde será entregue o pacote: ")
+            if cidade not in grafo.cidades:
+                print("Cidade não encontrada no mapa. Verifique se está digitando corretamente.")
+            else:
+                pacotes.append(cidade)
+                print("Pacote adicionado!")
+
+        elif opcao == "4":
+            if not pacotes:
+                print("Nenhum pacote cadastrado!")
+                continue
+
+            inicio = "Palmas"
+            atual = inicio
+            total_distancia = 0
+            rota_total = [inicio]
+            entregas = pacotes.copy()
+
+            print("\nCalculando rota de entregas a partir de Palmas...\n")
+
+            while entregas:
+                menor_dist = None
+                proxima_cidade = None
+                melhor_caminho = []
+
+                for destino in entregas:
+                    resultado = grafo.menor_caminho(atual, destino)
+                    if resultado:
+                        d, caminho = resultado
+                        if menor_dist is None or d < menor_dist:
+                            menor_dist = d
+                            melhor_caminho = caminho
+                            proxima_cidade = destino
+
+                if proxima_cidade:
+                    print(f"Entregando em {proxima_cidade} via: {' -> '.join(melhor_caminho)}")
+                    rota_total += melhor_caminho[1:]
+                    total_distancia += menor_dist
+                    entregas.remove(proxima_cidade)
+                    atual = proxima_cidade
+                else:
+                    print("Não foi possível alcançar todas as cidades.")
+                    break
+
+            print("\nRota final de entregas:")
+            print(" -> ".join(rota_total))
+            print(f"Distância total percorrida: {total_distancia} km")
+
+        elif opcao == "5":
+            print("Encerrando o sistema.")
+            break
+
+        else:
+            print("Opção inválida. Tente novamente.")
+
+if __name__ == "__main__":
+    menu()
+  
