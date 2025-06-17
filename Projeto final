@@ -35,11 +35,11 @@ class Grafo:
         return None
 
     def mostrar_mapa(self):
-        print("\n--- Mapa de Cidades e Rotas ---")
+        print("\n------------------------------------------------------ Mapa de Cidades e Rotas ------------------------------------------------------")
         for cidade in self.cidades:
             conexoes = ', '.join([f"{vizinho} ({dist} km)" for vizinho, dist in self.cidades[cidade]])
-            print(f"{cidade} -> {conexoes}")
-        print("-------------------------------\n")
+            print(f"{cidade} -> {conexoes}\n")
+        print("--------------------------------------------------------------------------------------------------------------------------------------\n\n")
 
 def carregar_mapa_tocantins(grafo):
     rotas = [
@@ -75,16 +75,27 @@ def menu():
     grafo = Grafo()
     pacotes = []
 
-    # Carrega o mapa automaticamente
-    carregar_mapa_tocantins(grafo)
+   
+    print("Deseja carregar o mapa do Tocantins ou criar seu próprio?")
+    print("1. Carregar mapa do Tocantins (recomendado)")
+    print("2. Criar minha própria rota manualmente")
+    escolha = input("Escolha (1 ou 2):")
+
+    if escolha == "1":
+        carregar_mapa_tocantins(grafo)
+    else:
+        print("Você pode começar adicionando rotas manualmente no menu.\n")
+
+
 
     while True:
-        print("\n--- MENU ---")
-        print("1. Adicionar rota")
-        print("2. Recarregar municípios do Tocantins")
-        print("3. Adicionar pacote")
-        print("4. Calcular rota de entregas (a partir de Palmas)")
-        print("5. Sair")
+        print("------------------- Calculador de rota -------------------")
+        print("#  1. Adicionar rota                                     #")
+        print("#  2. carregar rotas do Tocantins                        #")
+        print("#  3. Adicionar pacote                                   #")
+        print("#  4. Calcular rota de entregas                          #")
+        print("#  5. Sair                                               #")
+        print("----------------------------------------------------------")
         opcao = input("Escolha: ")
 
         if opcao == "1":
